@@ -24,7 +24,6 @@ export default function ImageWithMarkers({ imageSrc, markers = [], severity }) {
     observer.observe(containerRef.current);
     imgRef.current.addEventListener('load', updateDimensions);
     
-    // Initial check
     updateDimensions();
     
     return () => {
@@ -37,12 +36,11 @@ export default function ImageWithMarkers({ imageSrc, markers = [], severity }) {
 
   const getColorBySeverity = (sev) => {
     switch (sev?.toLowerCase()) {
-      case 'высокая': return '#ef4444'; // red-500
-      case 'средняя': return '#f97316'; // orange-500
-      case 'низкая': return '#eab308';  // yellow-500
-      case 'здоров':
-      case 'здорово': return '#22c55e'; // green-500
-      default: return '#3b82f6'; // blue-500
+      case 'жоғары': return '#ef4444';
+      case 'орташа': return '#f97316';
+      case 'төмен': return '#eab308';
+      case 'сау': return '#22c55e';
+      default: return '#3b82f6';
     }
   };
 
@@ -53,7 +51,7 @@ export default function ImageWithMarkers({ imageSrc, markers = [], severity }) {
       <img 
         ref={imgRef}
         src={imageSrc} 
-        alt="Analyzed plant" 
+        alt="Талданған өсімдік" 
         className="max-w-full rounded-xl block"
       />
       {dimensions.width > 0 && dimensions.height > 0 && markers.length > 0 && (
@@ -81,7 +79,7 @@ export default function ImageWithMarkers({ imageSrc, markers = [], severity }) {
                   y={ymin}
                   width={width}
                   height={height}
-                  fill={`${markerColor}33`} // 20% opacity hex
+                  fill={`${markerColor}33`}
                   stroke={markerColor}
                   strokeWidth="3"
                   rx="4"

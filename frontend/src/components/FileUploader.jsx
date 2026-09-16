@@ -35,7 +35,7 @@ export default function FileUploader({ onFileSelect, isLoading, disabled }) {
 
   const handleFile = (file) => {
     if (!file.type.startsWith('image/')) {
-      alert('Пожалуйста, выберите изображение');
+      alert('Сурет таңдаңыз');
       return;
     }
     setSelectedFile(file);
@@ -56,7 +56,7 @@ export default function FileUploader({ onFileSelect, isLoading, disabled }) {
 
   return (
     <div className="card mb-6">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">Загрузка изображения</h2>
+      <h2 className="text-xl font-semibold mb-4 text-gray-800">Суретті жүктеу</h2>
       
       {!selectedFile ? (
         <div 
@@ -78,8 +78,8 @@ export default function FileUploader({ onFileSelect, isLoading, disabled }) {
             disabled={disabled || isLoading}
           />
           <Upload className={`w-12 h-12 mx-auto mb-4 ${dragActive ? 'text-bio-500' : 'text-gray-400'}`} />
-          <p className="text-gray-600 mb-2 font-medium">Нажмите или перетащите фото сюда</p>
-          <p className="text-sm text-gray-400">Поддерживаются форматы JPG, PNG, WEBP</p>
+          <p className="text-gray-600 mb-2 font-medium">Суретті осында басыңыз немесе сүйреп әкеліңіз</p>
+          <p className="text-sm text-gray-400">JPG, PNG, WEBP форматтары қолданылады</p>
         </div>
       ) : (
         <div className="flex flex-col items-center">
@@ -110,7 +110,7 @@ export default function FileUploader({ onFileSelect, isLoading, disabled }) {
                 onClick={handleClear}
                 disabled={isLoading}
               >
-                Очистить
+                Тазалау
               </button>
               <button 
                 className="btn-primary flex items-center"
@@ -120,12 +120,12 @@ export default function FileUploader({ onFileSelect, isLoading, disabled }) {
                 {isLoading ? (
                   <>
                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Анализ...
+                    Талдау...
                   </>
                 ) : (
                   <>
                     <ImagePlus className="w-5 h-5 mr-2" />
-                    Анализировать
+                    Талдау
                   </>
                 )}
               </button>

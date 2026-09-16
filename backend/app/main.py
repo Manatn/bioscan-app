@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="BioScan API",
     version="1.0.0",
-    description="API бэкенда для анализа заболеваний растений на основе ИИ (Google Gemini)."
+    description="ЖИ (Google Gemini) негізінде өсімдік ауруларын талдауға арналған бэкенд API."
 )
 
 app.add_middleware(
@@ -24,25 +24,25 @@ app.add_middleware(
 
 @app.get("/health")
 async def health_check():
-    """Проверка статуса сервиса."""
+    """Сервис күйін тексеру."""
     return {"status": "ok"}
 
 @app.post("/api/v1/analyze", response_model=AnalyzeResponse)
 async def analyze(file: UploadFile = File(...)):
-    """Анализирует загруженное изображение на наличие болезней растений."""
+    """Жүктелген суретті өсімдік ауруларының бар-жоғына талдайды."""
     if not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="Файл должен быть изображением.")
+        raise HTTPException(status_code=400, detail="Файл сурет болуы керек.")
 
     try:
         file_bytes = await file.read()
         
-        # 1. Анализ изображения через Gemini
+        # 1. Суретті Gemini арқылы талдау
         analysis_result = await analyze_image(file_bytes, file.content_type)
         
         image_url = None
         analysis_id = None
         
-        # 2. Загрузка в Supabase (если доступно)
+        # 2. Supabase-ке жүктеу (егер қолжетімді болса)
         try:
             image_url = upload_image(file_bytes, file.filename, file.content_type)
             
@@ -51,7 +51,7 @@ async def analyze(file: UploadFile = File(...)):
             
             analysis_id = save_analysis(result_dict, image_url, file.filename)
         except Exception as sb_err:
-            logger.warning(f"Ошибка интеграции с Supabase: {sb_err}")
+            logger.warning(f"Supabase интеграциясының қатесі: {sb_err}")
 
         return AnalyzeResponse(
             result=analysis_result,
@@ -59,15 +59,15 @@ async def analyze(file: UploadFile = File(...)):
             analysis_id=analysis_id
         )
     except Exception as e:
-        logger.error(f"Внутренняя ошибка сервера: {e}")
-        raise HTTPException(status_code=500, detail="Ошибка при обработке изображения")
+        logger.error(f"Сервердің ішкі қатесі: {e}")
+        raise HTTPException(status_code=500, detail="Суретті өңдеу кезінде қате орын алды")
 
 @app.get("/api/v1/history", response_model=list[HistoryItem])
 async def history(limit: int = 20):
-    """Возвращает историю ранее проведенных анализов."""
+    """Бұрын жүргізілген талдаулардың тарихын қайтарады."""
     try:
         items = get_history(limit)
         return items
     except Exception as e:
-        logger.error(f"Ошибка при получении истории: {e}")
-        raise HTTPException(status_code=500, detail="Ошибка при получении истории")
+        logger.error(f"Тарихты алу кезінде қате орын алды: {e}")
+        raise HTTPException(status_code=500, detail="Тарихты алу кезінде қате орын алды")

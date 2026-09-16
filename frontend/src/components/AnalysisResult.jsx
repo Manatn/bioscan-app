@@ -10,10 +10,10 @@ export default function AnalysisResult({ result, imageSrc }) {
   
   const getSeverityBadge = (severity) => {
     const sevClass = {
-      'высокая': 'bg-red-100 text-red-800 border-red-200',
-      'средняя': 'bg-orange-100 text-orange-800 border-orange-200',
-      'низкая': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      'здоров': 'bg-green-100 text-green-800 border-green-200',
+      'жоғары': 'bg-red-100 text-red-800 border-red-200',
+      'орташа': 'bg-orange-100 text-orange-800 border-orange-200',
+      'төмен': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      'сау': 'bg-green-100 text-green-800 border-green-200',
     }[severity?.toLowerCase()] || 'bg-gray-100 text-gray-800 border-gray-200';
 
     return (
@@ -31,12 +31,12 @@ export default function AnalysisResult({ result, imageSrc }) {
             {isHealthy ? (
               <div className="flex items-center gap-1.5 text-green-600 font-medium bg-green-50 px-2 py-1 rounded-md text-sm">
                 <CheckCircle className="w-4 h-4" />
-                Растение здорово
+                Өсімдік сау
               </div>
             ) : (
               <div className="flex items-center gap-1.5 text-red-600 font-medium bg-red-50 px-2 py-1 rounded-md text-sm">
                 <AlertTriangle className="w-4 h-4" />
-                Обнаружено заболевание
+                Ауру анықталды
               </div>
             )}
             {getSeverityBadge(result.severity)}
@@ -51,7 +51,7 @@ export default function AnalysisResult({ result, imageSrc }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-          <h3 className="text-lg font-semibold mb-4 text-gray-800">Загруженное фото</h3>
+          <h3 className="text-lg font-semibold mb-4 text-gray-800">Жүктелген фото</h3>
           <div className="bg-gray-50 rounded-xl p-2 border border-gray-100">
             <ImageWithMarkers 
               imageSrc={imageSrc} 
@@ -65,7 +65,7 @@ export default function AnalysisResult({ result, imageSrc }) {
           <div>
             <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-gray-800">
               <Leaf className="w-5 h-5 text-bio-500" />
-              Визуальные признаки
+              Көрнекі белгілер
             </h3>
             {result.visual_signs && result.visual_signs.length > 0 ? (
               <ul className="space-y-2">
@@ -77,14 +77,14 @@ export default function AnalysisResult({ result, imageSrc }) {
                 ))}
               </ul>
             ) : (
-              <p className="text-gray-500 italic">Признаки не обнаружены</p>
+              <p className="text-gray-500 italic">Белгілер табылмады</p>
             )}
           </div>
 
           <div>
             <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-gray-800">
               <Stethoscope className="w-5 h-5 text-bio-500" />
-              Рекомендации
+              Ұсыныстар
             </h3>
             {result.recommendations && result.recommendations.length > 0 ? (
               <ol className="space-y-3">
@@ -98,7 +98,7 @@ export default function AnalysisResult({ result, imageSrc }) {
                 ))}
               </ol>
             ) : (
-              <p className="text-gray-500 italic">Рекомендации отсутствуют</p>
+              <p className="text-gray-500 italic">Ұсыныстар жоқ</p>
             )}
           </div>
         </div>

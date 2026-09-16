@@ -1,39 +1,39 @@
 -- ============================================
--- BioScan: Схема базы данных
+-- BioScan: Дерекқор схемасы
 -- ============================================
 
--- Таблица истории анализов растений
+-- Өсімдіктерді талдау тарихының кестесі
 CREATE TABLE IF NOT EXISTS analysis_history (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
     
-    -- Ссылка на изображение
+    -- Суретке сілтеме
     image_url TEXT NOT NULL,
-    image_path TEXT,  -- путь внутри Supabase Storage
+    image_path TEXT,  -- Supabase Storage ішіндегі жол
     
-    -- Результаты анализа
+    -- Талдау нәтижелері
     is_healthy BOOLEAN NOT NULL,
     condition_name TEXT NOT NULL,
     confidence DOUBLE PRECISION NOT NULL CHECK (confidence >= 0.0 AND confidence <= 1.0),
-    severity TEXT NOT NULL CHECK (severity IN ('Здоров', 'Низкая', 'Средняя', 'Высокая')),
+    severity TEXT NOT NULL CHECK (severity IN ('Сау', 'Төмен', 'Орташа', 'Жоғары')),
     
-    -- Детали (хранятся как JSONB для гибкости)
+    -- Мәліметтер (икемділік үшін JSONB ретінде сақталады)
     visual_signs JSONB DEFAULT '[]'::jsonb,
     visual_markers JSONB DEFAULT '[]'::jsonb,
     recommendations JSONB DEFAULT '[]'::jsonb,
     
-    -- Краткое заключение
+    -- Қысқаша түйіндеме
     summary TEXT
 );
 
--- Индекс для быстрой сортировки по дате
+-- Күн бойынша жылдам сұрыптауға арналған индекс
 CREATE INDEX IF NOT EXISTS idx_analysis_history_created_at 
     ON analysis_history(created_at DESC);
 
--- Включение Row Level Security
+-- Row Level Security (Жол деңгейіндегі қауіпсіздік) қосу
 ALTER TABLE analysis_history ENABLE ROW LEVEL SECURITY;
 
--- Политика: разрешить все операции (для простоты, в продакшене ограничить)
+-- Саясат: барлық операцияларға рұқсат беру (қарапайымдылық үшін, продакшенде шектеу қажет)
 CREATE POLICY "Allow public access" 
     ON analysis_history 
     FOR ALL 
@@ -41,16 +41,16 @@ CREATE POLICY "Allow public access"
     WITH CHECK (true);
 
 -- ============================================
--- Storage: бакет plant-scans
--- Создайте вручную в Supabase Dashboard:
+-- Storage: plant-scans бакеті
+-- Supabase Dashboard-та қолмен жасаңыз:
 --   1. Storage -> New Bucket
 --   2. Name: plant-scans
 --   3. Public bucket: ON
---   4. Добавьте политику доступа для INSERT и SELECT
+--   4. INSERT және SELECT үшін кіру саясатын қосыңыз
 -- ============================================
 
--- Пример политики для Storage (выполните в SQL Editor):
--- INSERT политика для бакета plant-scans:
+-- Storage үшін мысал саясат (SQL Editor-да орындаңыз):
+-- plant-scans бакеті үшін INSERT саясаты:
 INSERT INTO storage.policies (name, bucket_id, operation, definition)
 SELECT 
     'Allow public uploads',
@@ -61,7 +61,7 @@ FROM storage.buckets
 WHERE name = 'plant-scans'
 ON CONFLICT DO NOTHING;
 
--- SELECT политика для бакета plant-scans:
+-- plant-scans бакеті үшін SELECT саясаты:
 INSERT INTO storage.policies (name, bucket_id, operation, definition)
 SELECT 
     'Allow public reads',

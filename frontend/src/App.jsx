@@ -39,7 +39,6 @@ function App() {
 
     try {
       const response = await analyzeImage(file);
-      // API returns: { result: HealthAnalysisResult, image_url, analysis_id }
       setAnalysisResult(response.result);
       loadHistory();
     } catch (err) {
@@ -53,7 +52,6 @@ function App() {
     setError(null);
     setSelectedFile(null);
     setPreviewSrc(item.image_url);
-    // History items have flat structure matching HealthAnalysisResult fields
     setAnalysisResult({
       is_healthy: item.is_healthy,
       condition_name: item.condition_name,
@@ -74,7 +72,7 @@ function App() {
             <span className="text-3xl" role="img" aria-label="leaf">🌿</span>
             <div>
               <h1 className="text-2xl font-bold text-bio-800 leading-tight">BioScan</h1>
-              <p className="text-sm text-gray-500 font-medium">ИИ-диагностика заболеваний растений</p>
+              <p className="text-sm text-gray-500 font-medium">Өсімдіктер ауруларын ЖИ-диагностикалау</p>
             </div>
           </div>
         </div>
@@ -91,7 +89,7 @@ function App() {
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
-                <p className="font-medium">Ошибка</p>
+                <p className="font-medium">Қате</p>
                 <p className="text-sm">{error}</p>
               </div>
             )}
@@ -116,7 +114,7 @@ function App() {
 
       <footer className="bg-white border-t border-gray-200 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-500 text-sm">
-          <p>© {new Date().getFullYear()} BioScan. Проект для конкурса по биологии.</p>
+          <p>© {new Date().getFullYear()} BioScan. Биология бойынша жарысқа арналған жоба.</p>
         </div>
       </footer>
     </div>

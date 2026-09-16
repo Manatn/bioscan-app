@@ -6,7 +6,7 @@ export default function HistoryPanel({ history = [], onSelect, isLoading }) {
     <div className="card h-full flex flex-col">
       <div className="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100">
         <History className="w-5 h-5 text-bio-600" />
-        <h2 className="text-lg font-semibold text-gray-800">История анализов</h2>
+        <h2 className="text-lg font-semibold text-gray-800">Талдау тарихы</h2>
       </div>
 
       <div className="flex-1 overflow-y-auto pr-2 space-y-3">
@@ -22,13 +22,13 @@ export default function HistoryPanel({ history = [], onSelect, isLoading }) {
           ))
         ) : history.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <p className="mb-2">Нет анализов</p>
-            <p className="text-sm">Загрузите фото для первого анализа</p>
+            <p className="mb-2">Талдаулар жоқ</p>
+            <p className="text-sm">Бірінші талдау үшін фото жүктеңіз</p>
           </div>
         ) : (
           history.map((item) => {
             const isHealthy = item.is_healthy;
-            const date = new Date(item.created_at).toLocaleDateString('ru-RU', {
+            const date = new Date(item.created_at).toLocaleDateString('kk-KZ', {
               day: 'numeric',
               month: 'short',
               hour: '2-digit',
@@ -67,9 +67,9 @@ export default function HistoryPanel({ history = [], onSelect, isLoading }) {
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-gray-500">{date}</span>
                     <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                      item.severity?.toLowerCase() === 'высокая' ? 'bg-red-100 text-red-700' :
-                      item.severity?.toLowerCase() === 'средняя' ? 'bg-orange-100 text-orange-700' :
-                      item.severity?.toLowerCase() === 'низкая' ? 'bg-yellow-100 text-yellow-700' :
+                      item.severity?.toLowerCase() === 'жоғары' ? 'bg-red-100 text-red-700' :
+                      item.severity?.toLowerCase() === 'орташа' ? 'bg-orange-100 text-orange-700' :
+                      item.severity?.toLowerCase() === 'төмен' ? 'bg-yellow-100 text-yellow-700' :
                       'bg-green-100 text-green-700'
                     }`}>
                       {item.severity}
