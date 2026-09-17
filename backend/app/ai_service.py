@@ -1,7 +1,10 @@
+import asyncio
 import logging
+import random
 import re
 
 from google import genai
+from google.genai import errors as genai_errors
 from google.genai import types
 
 from app.config import settings
@@ -222,20 +225,54 @@ def _find_language_issues(result: HealthAnalysisResult) -> list[str]:
     return sorted(flagged)
 
 
+# 503 (моделге сұраныс тым көп) және 429 (rate limit) — уақытша қателер,
+# қайталап көру арқылы шешіледі. Басқа қателер (400, 401, 404 т.б.) —
+# сұраудың өзінде мәселе бар дегенді білдіреді, оларды қайталаудың мәні жоқ.
+_RETRYABLE_STATUS_CODES = {429, 503}
+_MAX_RETRIES = 3
+_BASE_DELAY_SECONDS = 1.5
+
+
 async def _call_gemini(contents: list) -> HealthAnalysisResult | None:
-    response = await client.aio.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=contents,
-        config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT,
-            response_mime_type="application/json",
-            response_schema=HealthAnalysisResult,
-            # Аз да болса thinking budget: қатаң тілдік ережелер + құрылымды JSON
-            # бір мезгілде сақталуы моделге "ойлануға" орын қалдырғанда жақсарады.
-            thinking_config=types.ThinkingConfig(thinking_budget=256),
-        ),
-    )
-    return response.parsed
+    last_error: Exception | None = None
+
+    for attempt in range(1, _MAX_RETRIES + 1):
+        try:
+            response = await client.aio.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=contents,
+                config=types.GenerateContentConfig(
+                    system_instruction=SYSTEM_PROMPT,
+                    response_mime_type="application/json",
+                    response_schema=HealthAnalysisResult,
+                    # Аз да болса thinking budget: қатаң тілдік ережелер + құрылымды
+                    # JSON бір мезгілде сақталуы моделге "ойлануға" орын қалдырғанда
+                    # жақсарады.
+                    thinking_config=types.ThinkingConfig(thinking_budget=256),
+                ),
+            )
+            return response.parsed
+
+        except genai_errors.APIError as e:
+            status_code = getattr(e, "code", None)
+            last_error = e
+
+            if status_code not in _RETRYABLE_STATUS_CODES or attempt == _MAX_RETRIES:
+                raise
+
+            # Экспоненциалды backoff + jitter: барлық параллель сұраныстар бір
+            # мезгілде қайталанып, Google жағын тағы да "ұрып" кетпеу үшін.
+            delay = _BASE_DELAY_SECONDS * (2 ** (attempt - 1)) + random.uniform(0, 0.5)
+            logger.warning(
+                "Gemini %s қайтарды (әрекет %d/%d), %.1f секундтан кейін қайталанады: %s",
+                status_code, attempt, _MAX_RETRIES, delay, e,
+            )
+            await asyncio.sleep(delay)
+
+    # Бұл жерге теория жүзінде жетпеу керек, бірақ типтеуші үшін:
+    if last_error:
+        raise last_error
+    return None
 
 
 async def analyze_image(image_bytes: bytes, mime_type: str) -> HealthAnalysisResult:
